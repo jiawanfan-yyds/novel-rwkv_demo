@@ -1,0 +1,6 @@
+gradio==3.28.3
+numpy
+torch torchvision  --index-url https://download.pytorch.org/whl/cu118
+tokenizers
+rwkv
+prompt_toolkit
