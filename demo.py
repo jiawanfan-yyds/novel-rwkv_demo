@@ -20,7 +20,7 @@ os.environ['RWKV_JIT_ON'] = '1'
 os.environ["RWKV_CUDA_ON"] = '0' # '1' to compile CUDA kernel (10x faster), requires c++ compiler & cuda libraries
 
 from rwkv.model import RWKV # pip install rwkv
-model_default = './models/RWKV-4-Novel-7B-v1-ChnEng-ChnPro-20230410-ctx4096'
+model_default = './models/RWKV-4-Novel-7B-v1-Chn-20230426-ctx8192'
 strategy_default = 'cuda fp16i8'
 model = RWKV(model_default, strategy_default)
 
@@ -43,8 +43,7 @@ from rwkv.utils import PIPELINE, PIPELINE_ARGS
 pipeline = PIPELINE(model, "20B_tokenizer.json")
 
 def generate_output(context, temperature, top_p, alpha_frequency, alpha_presence, token_count, model_name=os.path.basename(model_default), strategy=strategy_default):
-    context = "+gen" + context
-    model_path = model_folder + "/" +model_options[model_options.index(os.path.basename(model_name))]
+    model_path = model_folder + "/" + os.path.splitext(model_name)[0]
     global model_default, strategy_default, model
     if model_path != model_default or strategy != strategy_default:
         model_default = model_path
@@ -52,7 +51,7 @@ def generate_output(context, temperature, top_p, alpha_frequency, alpha_presence
         model = RWKV(model=model_default, strategy=strategy_default)
 
     args = PIPELINE_ARGS(temperature=temperature,
-                         top_p=top_p, 
+                         top_p=top_p,
                          top_k=0, # top_k = 0 then ignore
                          alpha_frequency=alpha_frequency,
                          alpha_presence=alpha_presence,
@@ -74,7 +73,7 @@ novel = gr.Interface(fn=generate_output,
                         gr.components.Slider(label="countPenalty",info="越高则越少出现重复单词", minimum=0.1, maximum=1.0, step=0.05, default=0.5),
                         gr.components.Slider(label="presencePenalty",info="越高则越避免生成重复内容",minimum=0.1, maximum=1.0, step=0.05, default=0.5),
                         gr.components.Slider(label="Token Count",info="控制每次生成的文本长度",minimum=10, maximum=500, step=1, default=200),
-                        gr.components.Dropdown(value=os.path.basename(model_default), label="模型",choices=model_options),
+                        gr.components.Dropdown(value=os.path.splitext(os.path.basename(model_default))[0], label="模型",choices=model_options),
                         gr.components.Dropdown(value=strategy_default,choices=[
                                                     "cuda fp16",
                                                     "cpu fp32",
@@ -120,4 +119,4 @@ strategy_about = gr.Interface(
 demo = gr.TabbedInterface(interface_list=[novel,strategy_about],title = "基于rmkv模型的demo",tab_names=["续写小说","更多"])
 
 if __name__ == "__main__":
-    demo.launch(server_port=7777,share=True)
+    demo.launch(server_name="192.168.99.242",server_port=7777,share=True)
