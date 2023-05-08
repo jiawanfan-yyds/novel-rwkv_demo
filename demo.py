@@ -2,7 +2,9 @@ import gradio as gr
 import os, sys, torch
 import numpy as np
 from gradio import components
+import json
 np.set_printoptions(precision=4, suppress=True, linewidth=200)
+import webbrowser
 
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.allow_tf32 = True
@@ -20,8 +22,25 @@ os.environ['RWKV_JIT_ON'] = '1'
 os.environ["RWKV_CUDA_ON"] = '0' # '1' to compile CUDA kernel (10x faster), requires c++ compiler & cuda libraries
 
 from rwkv.model import RWKV # pip install rwkv
-model_default = './models/RWKV-4-Novel-7B-v1-Chn-20230426-ctx8192'
-strategy_default = 'cuda fp16i8'
+# model_default = './models/RWKV-4-Novel-7B-v1-Chn-20230426-ctx8192'
+# strategy_default = 'cuda fp16'
+
+# 保存更新后的 model_default 和 strategy_default 的值到 JSON 文件中
+model_default_data = {  
+    "model_default": "./models/RWKV-4-Novel-7B-v1-Chn-20230426-ctx8192",  
+    "strategy_default": "cuda fp16i8",  
+}
+
+if not os.path.exists('model_default.json'):  
+    with open('model_default.json', 'w') as f:  
+        json.dump(model_default_data, f)  
+else:  
+    with open('model_default.json', 'r',encoding="utf-8") as f:  
+        model_default_data = json.load(f)
+
+model_default = model_default_data.get('model_default')
+strategy_default = model_default_data.get('strategy_default')
+
 model = RWKV(model_default, strategy_default)
 
 model_folder = "./models"  # 模型文件夹的路径
@@ -48,6 +67,12 @@ def generate_output(context, temperature, top_p, alpha_frequency, alpha_presence
     if model_path != model_default or strategy != strategy_default:
         model_default = model_path
         strategy_default = strategy
+        
+        model_default_data['model_default'] = model_default
+        model_default_data['strategy_default'] = strategy_default
+        with open('model_default.json', 'w') as f:  
+            json.dump(model_default_data, f) 
+            
         model = RWKV(model=model_default, strategy=strategy_default)
 
     args = PIPELINE_ARGS(temperature=temperature,
@@ -113,10 +138,10 @@ strategy_about = gr.Interface(
     interpretation="default",
     allow_flagging="never",
     live=True,
-    description= "<b>[rmkv作者模型下载地址]<b>https://huggingface.co/BlinkDL \n<b>[rmkv作者关于strategy的详解]<b>https://zhuanlan.zhihu.com/p/609154637 \n<b>[本仓库地址]<b>"
+    description= "<b>[rmkv作者模型下载地址]<b>https://huggingface.co/BlinkDL \n<b>[rmkv作者关于strategy的详解]<b>https://zhuanlan.zhihu.com/p/609154637 \n<b>[本项目地址]<b>https://github.com/jiawanfan-yyds/novel-rmkv_demo"
 )
 
 demo = gr.TabbedInterface(interface_list=[novel,strategy_about],title = "基于rmkv模型的demo",tab_names=["续写小说","更多"])
 
 if __name__ == "__main__":
-    demo.launch(server_name="192.168.99.242",server_port=7777,share=True)
+    demo.launch(server_port=7777,share=True,inbrowser=True)

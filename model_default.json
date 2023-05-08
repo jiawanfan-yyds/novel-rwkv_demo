@@ -1,0 +1,1 @@
+{"model_default": "./models/RWKV-4-Novel-7B-v1-Chn-20230426-ctx8192", "strategy_default": "cuda fp16i8"}
