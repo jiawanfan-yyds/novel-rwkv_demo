@@ -141,7 +141,7 @@ strategy_about = gr.Interface(
     description= "<b>[rmkv作者模型下载地址]<b>https://huggingface.co/BlinkDL \n<b>[rmkv作者关于strategy的详解]<b>https://zhuanlan.zhihu.com/p/609154637 \n<b>[本项目地址]<b>https://github.com/jiawanfan-yyds/novel-rmkv_demo"
 )
 
-demo = gr.TabbedInterface(interface_list=[novel,strategy_about],title = "基于rmkv模型的demo",tab_names=["续写小说","更多"])
+demo = gr.TabbedInterface(interface_list=[novel,strategy_about],title = "基于rwkv模型的demo",tab_names=["续写小说","更多"])
 
 if __name__ == "__main__":
     demo.launch(server_port=7777,share=True,inbrowser=True)
