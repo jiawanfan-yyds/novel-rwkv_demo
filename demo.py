@@ -138,7 +138,7 @@ strategy_about = gr.Interface(
     interpretation="default",
     allow_flagging="never",
     live=True,
-    description= "<b>[rmkv作者模型下载地址]<b>https://huggingface.co/BlinkDL \n<b>[rmkv作者关于strategy的详解]<b>https://zhuanlan.zhihu.com/p/609154637 \n<b>[本项目地址]<b>https://github.com/jiawanfan-yyds/novel-rmkv_demo"
+    description= "<b>[rwkv作者模型下载地址]<b>https://huggingface.co/BlinkDL \n<b>[rwkv作者关于strategy的详解]<b>https://zhuanlan.zhihu.com/p/609154637 \n<b>[本项目地址]<b>https://github.com/jiawanfan-yyds/novel-rwkv_demo"
 )
 
 demo = gr.TabbedInterface(interface_list=[novel,strategy_about],title = "基于rwkv模型的demo",tab_names=["续写小说","更多"])
